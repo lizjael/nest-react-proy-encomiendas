@@ -5,12 +5,18 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const corsOrigin =
-    process.env.CORS_ORIGIN ?? 'https://react-proy-encomiendas.onrender.com';
-  console.log('CORS ORIGIN:', corsOrigin);
+  // const corsOrigin =
+  //   process.env.CORS_ORIGIN ?? 'https://react-proy-encomiendas.onrender.com';
+  // console.log('CORS ORIGIN:', corsOrigin);
 
+  // app.enableCors({
+  //   origin: corsOrigin,
+  //   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  //   allowedHeaders: ['Content-Type', 'Authorization'],
+  //   credentials: true,
+  // });
   app.enableCors({
-    origin: corsOrigin,
+    origin: 'https://react-proy-encomiendas.onrender.com',
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
