@@ -3,12 +3,15 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  // ✅ CRÍTICO: await en NestFactory.create
   const app = await NestFactory.create(AppModule);
 
+  const corsOrigin =
+    process.env.CORS_ORIGIN ?? 'https://react-proy-encomiendas.onrender.com';
+  console.log('CORS ORIGIN:', corsOrigin);
+
   app.enableCors({
-    origin: ['http://localhost:5173'],
-    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    origin: corsOrigin,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
@@ -21,7 +24,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(3000);
-  console.log('Backend corriendo en http://localhost:3000');
+  await app.listen(process.env.PORT ?? 3000);
+  console.log(`Backend corriendo en puerto ${process.env.PORT ?? 3000}`);
 }
 bootstrap();
