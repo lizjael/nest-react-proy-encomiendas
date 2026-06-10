@@ -33,7 +33,16 @@ export class Encomienda {
   @Column({ type: 'text', nullable: true })
   observaciones: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'costo_total' })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    name: 'costo_total',
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   costoTotal: number;
 
   @Column({ length: 50, name: 'estado_entrega', default: 'PENDIENTE' })
