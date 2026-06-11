@@ -182,4 +182,19 @@ export class UsersService {
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.userRepository.update(id, updateUserDto);
   }
+
+  async onModuleInit() {
+    try {
+      await this.userRepository.query(
+        `UPDATE users SET activo = true WHERE activo IS NULL`,
+      );
+    } catch (e) {
+      await this.userRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({ activo: true })
+        .where('activo IS NULL')
+        .execute();
+    }
+  }
 }

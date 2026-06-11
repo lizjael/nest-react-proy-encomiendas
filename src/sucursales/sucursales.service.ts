@@ -60,4 +60,13 @@ export class SucursalesService {
     const sucursal = await this.findOne(id);
     return await this.sucursalesRepository.softRemove(sucursal);
   }
+
+  async onModuleInit() {
+    await this.sucursalesRepository
+      .createQueryBuilder()
+      .update(Sucursal)
+      .set({ activo: true })
+      .where('activo IS NULL')
+      .execute();
+  }
 }
