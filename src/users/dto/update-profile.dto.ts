@@ -1,5 +1,11 @@
-import { IsOptional, IsString, IsNumber, IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsBoolean,
+} from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -31,6 +37,7 @@ export class UpdateProfileDto {
   turno?: string;
 
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   @IsDateString()
   fechaContratacion?: string;
 
@@ -39,9 +46,13 @@ export class UpdateProfileDto {
   @IsNumber()
   idSucursal?: number;
 
-  // El service lo referencia — necesita estar en el DTO
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   idSupervisor?: number;
+
+  // ✅ ESTE ES EL QUE FALTA — agrégalo
+  @IsOptional()
+  @IsBoolean()
+  activo?: boolean;
 }
