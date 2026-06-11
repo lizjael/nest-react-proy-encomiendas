@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserActiveInterface } from '../common/interfaces/user-active.interface';
 import { Role } from '../common/enums/rol.enum';
+import bcryptjs from 'node_modules/bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -39,17 +40,19 @@ export class UsersService {
   // Lista todos los usuarios. SUPER_ADMIN ve todos, ADMIN ve solo los de su sucursal.
   async findAll(activeUser: UserActiveInterface) {
     if (activeUser.role === Role.SUPER_ADMIN) {
+      // ✅ Ve todos excepto otros super_admins si quieres, o todos
       return this.userRepository.find({
         relations: { sucursal: true, supervisor: true },
+        order: { role: 'ASC', creadoEn: 'DESC' },
       });
     }
 
     if (activeUser.role === Role.ADMIN) {
-      // El admin ve los empleados (rol USER) de su propia sucursal
       const miPerfil = await this.userRepository.findOne({
         where: { id: activeUser.sub },
         relations: { sucursal: true },
       });
+      // ✅ Admin solo ve empleados (rol USER) de su sucursal
       return this.userRepository.find({
         where: {
           role: Role.USER,
@@ -59,10 +62,9 @@ export class UsersService {
       });
     }
 
-    // USER normal: solo su propio perfil
     return this.userRepository.find({
       where: { id: activeUser.sub },
-      relations: { sucursal: true, supervisor: true },
+      relations: { sucursal: true },
     });
   }
 
@@ -102,27 +104,34 @@ export class UsersService {
       where: { id },
       relations: { sucursal: true },
     });
-
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    // Verificar permisos
     if (activeUser.role === Role.USER && user.id !== activeUser.sub) {
       throw new ForbiddenException('Solo puedes editar tu propio perfil');
     }
 
     if (activeUser.role === Role.ADMIN) {
-      // Admin solo puede editar empleados de su sucursal
       const miPerfil = await this.userRepository.findOne({
         where: { id: activeUser.sub },
         relations: { sucursal: true },
       });
-      if (user.sucursal?.idSucursal !== miPerfil?.sucursal?.idSucursal) {
+      // ✅ FIX: si el user aún no tiene sucursal asignada, permitir que edite su propio perfil
+      if (
+        user.id !== activeUser.sub &&
+        user.sucursal?.idSucursal !== miPerfil?.sucursal?.idSucursal
+      ) {
         throw new ForbiddenException('Este usuario no pertenece a tu sucursal');
       }
     }
 
-    // Mapear relaciones
-    const updateData: any = { ...dto };
+    // ✅ FIX: limpiar campos vacíos para no pisar datos existentes ni romper unique constraints
+    const updateData: any = {};
+    for (const [key, value] of Object.entries(dto)) {
+      if (value !== undefined && value !== '') {
+        updateData[key] = value;
+      }
+    }
+
     if (dto.idSucursal) {
       updateData.sucursal = { idSucursal: dto.idSucursal };
       delete updateData.idSucursal;
@@ -132,11 +141,34 @@ export class UsersService {
       delete updateData.idSupervisor;
     }
 
-    await this.userRepository.update(id, updateData);
+    if (Object.keys(updateData).length > 0) {
+      await this.userRepository.update(id, updateData);
+    }
+
     return this.userRepository.findOne({
       where: { id },
       relations: { sucursal: true, supervisor: true },
     });
+  }
+
+  async createUser(dto: CreateUserDto, activeUser: UserActiveInterface) {
+    // Admin solo puede crear empleados
+    if (activeUser.role === Role.ADMIN && dto.role && dto.role !== Role.USER) {
+      throw new ForbiddenException('Como admin solo puedes crear empleados');
+    }
+
+    const exists = await this.userRepository.findOne({
+      where: { email: dto.email },
+    });
+    if (exists) throw new BadRequestException('El email ya está registrado');
+
+    const hashed = await bcryptjs.hash(dto.password, 10);
+    const newUser = this.userRepository.create({
+      ...dto,
+      password: hashed,
+      role: dto.role ?? Role.USER,
+    });
+    return this.userRepository.save(newUser);
   }
 
   async remove(id: number) {

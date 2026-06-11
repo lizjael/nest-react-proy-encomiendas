@@ -6,6 +6,8 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  Post,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Auth } from '../auth/decorators/auth.decorators';
@@ -13,6 +15,8 @@ import { ActiveUser } from '../common/decorators/active-user.decorator';
 import { Role } from '../common/enums/rol.enum';
 import type { UserActiveInterface } from '../common/interfaces/user-active.interface';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import * as bcryptjs from 'bcryptjs';
 
 @Controller('users')
 export class UsersController {
@@ -54,6 +58,15 @@ export class UsersController {
   ) {
     // findOne(id, activeUser) — firma real del service
     return this.usersService.findOne(id, activeUser);
+  }
+  // POST /users — crear usuario (super_admin cualquier rol, admin solo USER)
+  @Post()
+  @Auth(Role.ADMIN)
+  async createUser(
+    @Body() dto: CreateUserDto,
+    @ActiveUser() activeUser: UserActiveInterface,
+  ) {
+    return this.usersService.createUser(dto, activeUser);
   }
 
   // PATCH /users/:id/perfil — admin edita empleado de su sucursal
