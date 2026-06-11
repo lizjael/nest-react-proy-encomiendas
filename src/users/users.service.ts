@@ -115,7 +115,6 @@ export class UsersService {
         where: { id: activeUser.sub },
         relations: { sucursal: true },
       });
-      // ✅ FIX: si el user aún no tiene sucursal asignada, permitir que edite su propio perfil
       if (
         user.id !== activeUser.sub &&
         user.sucursal?.idSucursal !== miPerfil?.sucursal?.idSucursal
@@ -124,18 +123,15 @@ export class UsersService {
       }
     }
 
-    // ✅ FIX: limpiar campos vacíos para no pisar datos existentes ni romper unique constraints
+    // ✅ Procesar todos los campos del DTO (incluyendo 'estado')
     const updateData: any = {};
     for (const [key, value] of Object.entries(dto)) {
-      // Excluir solo undefined y string vacío, pero NO false ni 0
       if (value !== undefined && value !== '') {
         updateData[key] = value;
       }
     }
-    if (dto.activo !== undefined) {
-      updateData.activo = dto.activo;
-    }
 
+    // Manejar relaciones
     if (dto.idSucursal) {
       updateData.sucursal = { idSucursal: dto.idSucursal };
       delete updateData.idSucursal;
@@ -154,7 +150,6 @@ export class UsersService {
       relations: { sucursal: true, supervisor: true },
     });
   }
-
   async createUser(dto: CreateUserDto, activeUser: UserActiveInterface) {
     // Admin solo puede crear empleados
     if (activeUser.role === Role.ADMIN && dto.role && dto.role !== Role.USER) {
