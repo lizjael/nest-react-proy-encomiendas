@@ -62,11 +62,12 @@ export class SucursalesService {
   }
 
   async onModuleInit() {
-    await this.sucursalesRepository
-      .createQueryBuilder()
-      .update(Sucursal)
-      .set({ activo: true })
-      .where('activo IS NULL')
-      .execute();
+    try {
+      await this.sucursalesRepository.query(
+        `UPDATE "sucursal" SET activo = true WHERE activo IS NULL`,
+      );
+    } catch (e) {
+      // ignorar si la columna aún no existe
+    }
   }
 }

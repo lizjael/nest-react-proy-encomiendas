@@ -186,15 +186,10 @@ export class UsersService {
   async onModuleInit() {
     try {
       await this.userRepository.query(
-        `UPDATE users SET activo = true WHERE activo IS NULL`,
+        `UPDATE "users" SET activo = true WHERE activo IS NULL`,
       );
     } catch (e) {
-      await this.userRepository
-        .createQueryBuilder()
-        .update(User)
-        .set({ activo: true })
-        .where('activo IS NULL')
-        .execute();
+      // ignorar si la columna aún no existe
     }
   }
 }
