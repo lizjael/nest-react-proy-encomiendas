@@ -23,14 +23,14 @@ export class CreateEncomiendaDto {
 
   @ApiProperty({ example: '2024-01-15', description: 'Fecha de emisión' })
   @IsDateString()
-  fechaEmision: Date;
+  fechaEmision: string;
 
   @ApiProperty({
     example: '2024-01-30',
     description: 'Fecha límite de entrega',
   })
   @IsDateString()
-  fechaLimiteEntrega: Date;
+  fechaLimiteEntrega: string;
 
   @ApiProperty({
     example: 'Frágil',
