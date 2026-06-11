@@ -27,6 +27,9 @@ export class Sucursal {
   @Column({ length: 20 })
   telefono: string;
 
+  @Column({ type: 'varchar', length: 10, default: 'Activo' })
+  estado: string;
+
   @CreateDateColumn()
   creadoEn: Date;
 

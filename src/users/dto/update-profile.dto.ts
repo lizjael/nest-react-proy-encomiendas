@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsDateString,
   IsBoolean,
+  IsIn,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
@@ -51,8 +52,9 @@ export class UpdateProfileDto {
   @IsNumber()
   idSupervisor?: number;
 
-  // ✅ ESTE ES EL QUE FALTA — agrégalo
+  // REEMPLAZA el campo activo completo por:
   @IsOptional()
-  @IsBoolean()
-  activo?: boolean;
+  @IsString()
+  @IsIn(['Activo', 'Inactivo'])
+  estado?: string;
 }

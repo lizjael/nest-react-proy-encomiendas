@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, Length, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, Length, Matches, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateSucursalDto {
   @ApiProperty({
@@ -50,4 +51,9 @@ export class CreateSucursalDto {
     message: 'El teléfono solo puede contener números, + y -',
   })
   telefono: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['Activo', 'Inactivo'])
+  estado?: string;
 }

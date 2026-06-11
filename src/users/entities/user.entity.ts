@@ -30,6 +30,8 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;
 
+  @Column({ type: 'varchar', length: 10, default: 'Activo' })
+  estado: string;
   // ── Campos de perfil (opcionales al registrar, se completan al crear empleado/admin) ──
   @Column({ length: 100, nullable: true })
   nombres: string;

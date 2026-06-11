@@ -6,6 +6,7 @@ import {
   IsBoolean,
   Length,
   Matches,
+  IsIn,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -31,9 +32,9 @@ export class UpdateSucursalDto extends PartialType(CreateSucursalDto) {
   @Matches(/^[0-9+-]+$/)
   telefono?: string;
 
-  // ✅ campo nuevo
-  @ApiPropertyOptional({ description: 'Estado activo/inactivo de la sucursal' })
+  // REEMPLAZA el campo activo por:
   @IsOptional()
-  @IsBoolean()
-  activo?: boolean;
+  @IsString()
+  @IsIn(['Activo', 'Inactivo'])
+  estado?: string;
 }
