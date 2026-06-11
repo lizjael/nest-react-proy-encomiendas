@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import * as bcryptjs from 'bcryptjs';
+import { UserActiveInterface } from 'src/common/interfaces/user-active.interface';
 
 @Injectable()
 export class AuthService {
@@ -48,7 +49,7 @@ export class AuthService {
     return { token, email };
   }
 
-  async profile({ email, role }: { email: string; role: string }) {
-    return await this.usersService.findOneByEmail(email);
+  async profile(user: UserActiveInterface) {
+    return await this.usersService.findMyProfile(user);
   }
 }
