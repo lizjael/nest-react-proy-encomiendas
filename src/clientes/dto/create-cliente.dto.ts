@@ -7,6 +7,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreateClienteDto {
   @ApiProperty({
@@ -14,11 +15,8 @@ export class CreateClienteDto {
     example: 'persona',
     enum: ['persona', 'empresa'],
   })
+  @Transform(({ value }) => value?.toUpperCase())
   @IsString({ message: 'El tipo de cliente debe ser un texto' })
-  @IsNotEmpty({ message: 'El tipo de cliente es obligatorio' })
-  @Matches(/^(persona|empresa)$/, {
-    message: 'El tipo de cliente debe ser "persona" o "empresa"',
-  })
   tipoCliente: string;
 
   @ApiProperty({
