@@ -16,7 +16,7 @@ async function bootstrap() {
   //   credentials: true,
   // });
   app.enableCors({
-    origin: 'https://react-proy-encomiendas.onrender.com',
+    origin: 'https://react-proy-encomiendas-1.onrender.com',
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
