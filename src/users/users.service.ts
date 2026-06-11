@@ -58,7 +58,7 @@ export class UsersService {
           role: Role.USER,
           sucursal: { idSucursal: miPerfil?.sucursal?.idSucursal },
         },
-        relations: { sucursal: true, supervisor: true },
+        relations: { sucursal: true, supervisor: true }, // ✅ ya debe estar así
       });
     }
 
