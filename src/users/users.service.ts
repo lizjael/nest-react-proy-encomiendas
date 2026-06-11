@@ -13,7 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserActiveInterface } from '../common/interfaces/user-active.interface';
 import { Role } from '../common/enums/rol.enum';
-import bcryptjs from 'node_modules/bcryptjs';
+import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -127,9 +127,13 @@ export class UsersService {
     // ✅ FIX: limpiar campos vacíos para no pisar datos existentes ni romper unique constraints
     const updateData: any = {};
     for (const [key, value] of Object.entries(dto)) {
+      // Excluir solo undefined y string vacío, pero NO false ni 0
       if (value !== undefined && value !== '') {
         updateData[key] = value;
       }
+    }
+    if (dto.activo !== undefined) {
+      updateData.activo = dto.activo;
     }
 
     if (dto.idSucursal) {
